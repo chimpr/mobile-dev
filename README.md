@@ -11,11 +11,11 @@
 ## **Features**
 
 ## **Contributing**
-- Project Manager:
-- Database: 
-- API Dev 1: 
-- Frontend Dev 1: 
-- Frontend Dev 2: 
+- Project Manager, Database, API Dev: Catalina
+- REACT, API Dev: Andres
+- Website Frontend Dev[REACT]: Jonathan
+- Mobile Frontend Dev[Flutter]: Stanley
+
 
 ## **FAQs**
 - Any concerns, questions, or bugs caught? Let us know [here](https://github.com/cataon03/cop4331-group5/issues)

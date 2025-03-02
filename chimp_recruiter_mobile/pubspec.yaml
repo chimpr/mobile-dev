@@ -88,8 +88,12 @@ flutter:
   # see https://flutter.dev/to/font-from-package
   assets:
     - assets/images/chimp.jpg
+    - assets/images/businessman.png
 
   fonts:
     - family: IrishGrover
       fonts:
         - asset: assets/fonts/IrishGrover-Regular.ttf
+    - family: PermanentMarker
+      fonts:
+        - asset: assets/fonts/PermanentMarker-Regular.ttf

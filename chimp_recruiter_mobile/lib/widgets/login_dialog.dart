@@ -1,3 +1,4 @@
+import 'package:chimp_recruiter_mobile/screens/candidate_page.dart';
 import 'package:flutter/material.dart';
 
 class LoginDialog extends StatelessWidget {
@@ -77,6 +78,11 @@ class LoginDialog extends StatelessWidget {
                   ElevatedButton(
                     onPressed: () {
                       // implement the login function later
+                      Navigator.push(
+                        context, MaterialPageRoute(
+                          builder: (context) => CandidatePage(), 
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(100, 50),

@@ -1,19 +1,111 @@
 import 'package:flutter/material.dart';
 
 class LoginDialog extends StatelessWidget {
+
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
       elevation: 16,
       child: Container(
+        height: 350,
+        width: 400,
+        decoration: BoxDecoration(
+          color: Color(0xFFC6E7FF),
+          borderRadius: BorderRadius.circular(40),
+        ),
         child: ListView(
           shrinkWrap: true,
           children: <Widget>[
             SizedBox(height: 20),
-            Center(child: Text('Log In')),
+            Center(child: Text(
+              'Log In',
+              style: TextStyle(
+                fontFamily: 'PermanentMarker',
+                fontSize: 36,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
+            )),
             SizedBox(height: 20),
             // Copied this from stackoverflow, check what is needed here
+
+            // User field
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: TextFormField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+
+            // Pass field
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: TextFormField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Password',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+
+                  ElevatedButton(
+                    onPressed: () {
+                      // implement the login function later
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(100, 50),
+                      backgroundColor: Color(0xFFD4F6FF),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text('Enter'),
+                  ),
+
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: Size(100, 50),
+                      backgroundColor: Color(0xFFD4F6FF),
+                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    child: Text('Cancel'),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

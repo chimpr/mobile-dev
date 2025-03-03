@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 import '../widgets/login_dialog.dart';
 import '../screens/candidate_page.dart';
 import '../screens/recruiter_page.dart';
+import '../screens/webview_page.dart';
 import '../routes/custom_route.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -75,7 +77,11 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(width: 50),
                   ElevatedButton(
                     onPressed: () {
-                      
+                      Navigator.push(
+                        context, MaterialPageRoute(
+                          builder: (context) => WebViewContainer(), 
+                        ),
+                      );
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: Size(130, 100),

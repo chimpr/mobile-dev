@@ -1,5 +1,6 @@
 import 'package:chimp_recruiter_mobile/screens/candidate_page.dart';
 import 'package:flutter/material.dart';
+import 'package:chimp_recruiter_mobile/screens/webview_page.dart';
 
 class LoginDialog extends StatelessWidget {
 
@@ -9,7 +10,8 @@ class LoginDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      insetPadding: EdgeInsets.only(top: 10.0, left: 20.0, bottom: 30.0, right: 20.0),
       elevation: 16,
       child: Container(
         height: 350,
@@ -34,7 +36,7 @@ class LoginDialog extends StatelessWidget {
             SizedBox(height: 20),
             // Copied this from stackoverflow, check what is needed here
 
-            // User field
+            // Username field
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: TextFormField(
@@ -51,7 +53,7 @@ class LoginDialog extends StatelessWidget {
             ),
             SizedBox(height: 20),
 
-            // Pass field
+            // Password field
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: TextFormField(
@@ -67,8 +69,35 @@ class LoginDialog extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 10),
 
+            // Forgot password
+            Padding(
+              padding: const EdgeInsets.only(right: 20.0, left: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context, 
+                    MaterialPageRoute(
+                      builder: (context) => WebViewContainer(),
+                    ),
+                  );
+                },
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'Forgot Password?',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Buttons for the form
             Padding(
               padding: const EdgeInsets.all(20.0),
               child: Row(

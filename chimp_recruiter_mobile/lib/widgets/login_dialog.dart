@@ -1,10 +1,10 @@
-import 'package:chimp_recruiter_mobile/screens/candidate_page.dart';
+import 'package:chimp_recruiter_mobile/screens/student_page.dart';
 import 'package:flutter/material.dart';
 import 'package:chimp_recruiter_mobile/screens/webview_page.dart';
 
 class LoginDialog extends StatelessWidget {
 
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   @override
@@ -40,9 +40,9 @@ class LoginDialog extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: TextFormField(
-                controller: _usernameController,
+                controller: _emailController,
                 decoration: InputDecoration(
-                  labelText: 'Username',
+                  labelText: 'Email',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -109,7 +109,7 @@ class LoginDialog extends StatelessWidget {
                       // implement the login function later
                       Navigator.push(
                         context, MaterialPageRoute(
-                          builder: (context) => CandidatePage(), 
+                          builder: (context) => StudentPage(), 
                         ),
                       );
                     },

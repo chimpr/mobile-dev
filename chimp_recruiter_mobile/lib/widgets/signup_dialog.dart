@@ -1,4 +1,5 @@
-import 'package:chimp_recruiter_mobile/screens/candidate_page.dart';
+import 'package:chimp_recruiter_mobile/screens/student_page.dart';
+import 'package:chimp_recruiter_mobile/screens/recruiter_page.dart';
 import 'package:flutter/material.dart';
 
 class SignupDialog extends StatefulWidget {
@@ -7,12 +8,32 @@ class SignupDialog extends StatefulWidget {
 }
 
 class _SignupDialogState extends State<SignupDialog> {
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
 
-  String _userType = 'Candidate';
+  String _userType = 'Student';
+  String? _firstNameError;
+  String? _lastNameError;
+  String? _emailError;
+  String? _passwordError;
+  String? _confirmPasswordError;
+
+  // Checks for valid email format
+  bool _isValidEmail(String email) {
+    String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(email);
+  }
+
+  // Check password format (8 characters, 1 Upper, 1 Symbol, 1 Number)
+  bool _isValidPassword(String password) {
+    String pattern = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$';
+    RegExp regex = RegExp(pattern);
+    return regex.hasMatch(password);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,18 +65,37 @@ class _SignupDialogState extends State<SignupDialog> {
             SizedBox(height: 10),
             // Copied this from stackoverflow, check what is needed here
 
-            // Username field
+            // First name field
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20.0),
               child: TextFormField(
-                controller: _usernameController,
+                controller: _firstNameController,
                 decoration: InputDecoration(
-                  labelText: 'Username',
+                  labelText: 'First Name',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   filled: true,
                   fillColor: Colors.white,
+                  errorText: _firstNameError, 
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+
+            // Last name field
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: TextFormField(
+                controller: _lastNameController,
+                decoration: InputDecoration(
+                  labelText: 'Last Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  filled: true,
+                  fillColor: Colors.white,
+                  errorText: _lastNameError,
                 ),
               ),
             ),
@@ -73,6 +113,7 @@ class _SignupDialogState extends State<SignupDialog> {
                   ),
                   filled: true,
                   fillColor: Colors.white,
+                  errorText: _emailError,
                 ),
               ),
             ),
@@ -91,6 +132,7 @@ class _SignupDialogState extends State<SignupDialog> {
                   ),
                   filled: true,
                   fillColor: Colors.white,
+                  errorText: _passwordError,
                 ),
               ),
             ),
@@ -109,6 +151,7 @@ class _SignupDialogState extends State<SignupDialog> {
                   ),
                   filled: true,
                   fillColor: Colors.white,
+                  errorText: _confirmPasswordError,
                 ),
               ),
             ),
@@ -137,7 +180,7 @@ class _SignupDialogState extends State<SignupDialog> {
                   ),
                   Text('Recruiter'),
                   Radio<String>(
-                    value: 'Candidate',
+                    value: 'Student',
                     groupValue: _userType,
                     onChanged: (value) {
                       setState(() {
@@ -145,7 +188,7 @@ class _SignupDialogState extends State<SignupDialog> {
                       });
                     },
                   ),
-                  Text('Candidate'),
+                  Text('Student'),
                 ],
               ),
             ),
@@ -158,15 +201,72 @@ class _SignupDialogState extends State<SignupDialog> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                
                     ElevatedButton(
                       onPressed: () {
-                        // implement the login function later
-                        Navigator.push(
-                          context, MaterialPageRoute(
-                            builder: (context) => CandidatePage(), 
-                          ),
-                        );
+
+                        // Check if first name is empty
+                        if (_firstNameController.text.isEmpty) {
+                          setState(() {
+                            _firstNameError = "Empty Field";
+                          });
+                          return;
+                        } else {
+                          setState(() {
+                            _firstNameError = null;
+                          });
+                        }
+
+                        // Check if last name is empty
+                        if (_lastNameController.text.isEmpty) {
+                          setState(() {
+                            _lastNameError = "Empty Field";
+                          });
+                          return;
+                        } else {
+                          setState(() {
+                            _lastNameError = null;
+                          });
+                        }
+
+                        // Validate Email
+                        if (!_isValidEmail(_emailController.text)) {
+                          setState(() {
+                            _emailError = 'Invalid Email Address';
+                          });
+                          return;
+                        } else {
+                          setState(() {
+                            _emailError = null;
+                          });
+                        }
+
+                        // Validate Password
+                        if (!_isValidPassword(_passwordController.text)) {
+                          setState(() {
+                            _passwordError = 'Invalid Password';
+                          });
+                          return;
+                        } else {
+                          setState(() {
+                            _passwordError = null;
+                          });
+                        }
+
+                        // Check confirmation password match
+                        if (_passwordController.text != _confirmPasswordController.text) {
+                          setState(() {
+                            _confirmPasswordError = 'Passwords do not match';
+                          });
+                          return;
+                        }
+                        else {
+                          setState(() {
+                            _confirmPasswordError = null;
+                          });
+                        }
+
+                        // Perform signup API here then open the dialog box for email code
+
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(100, 50),

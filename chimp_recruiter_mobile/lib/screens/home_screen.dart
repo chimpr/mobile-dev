@@ -3,7 +3,7 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:chimp_recruiter_mobile/widgets/login_dialog.dart';
 import 'package:chimp_recruiter_mobile/widgets/signup_dialog.dart';
 import 'package:chimp_recruiter_mobile/screens/webview_page.dart';
-import '../screens/candidate_page.dart';
+import 'student_page.dart';
 import '../screens/recruiter_page.dart';
 import '../routes/custom_route.dart';
 
@@ -11,7 +11,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFC6E7FF),
+      backgroundColor: Color(0xFFFFFFFF),
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(

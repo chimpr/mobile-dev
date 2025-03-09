@@ -1,4 +1,5 @@
 import 'package:chimp_recruiter_mobile/screens/student_page.dart';
+import 'package:chimp_recruiter_mobile/widgets/forgot_password.dart';
 import 'package:flutter/material.dart';
 import 'package:chimp_recruiter_mobile/screens/webview_page.dart';
 
@@ -77,9 +78,8 @@ class LoginDialog extends StatelessWidget {
               child: GestureDetector(
                 onTap: () {
                   Navigator.push(
-                    context, 
-                    MaterialPageRoute(
-                      builder: (context) => WebViewContainer(),
+                    context, MaterialPageRoute(
+                      builder: (context) => ForgotPassword(), 
                     ),
                   );
                 },

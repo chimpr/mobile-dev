@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 class ForgotPassword extends StatefulWidget {
   @override
@@ -13,14 +16,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   bool _isEmailEntered = false;
   bool _isCodeSent = false;
-  bool _isEmailValid = false;
+  bool _isEmailValid = true;
+  bool _isCodeVerified = false;
+  bool _isLoading = false;
 
-  
-
-  // implement api call to see if username exists, temp set to true
-  bool doesExistEmail(String email) {
-    return true;
-  }
+  final String apiUrl = 'http://10.0.2.2:5001/api';
 
   // Password validation
   bool isValidPassword(String password) {
@@ -29,24 +29,145 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     return regex.hasMatch(password);
   }
 
-  // implement the email send
-  void sendCodeToEmail(String email) {
-    // implement the email API code
+  Future<void> sendCodeToEmail(String email) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final response = await http.post(
+      Uri.parse('$apiUrl/send-reset-code'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"email": email}),
+    );
 
     setState(() {
-      _isCodeSent = true;
+      _isLoading = false;
     });
+
+    if (response.statusCode == 200) {
+      setState(() {
+        _isCodeSent = true;
+        _isEmailEntered = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Verification code sent. Check your email.")),
+      );
+
+      return;
+    } else {
+      try {
+        final Map<String, dynamic> responseBody = jsonDecode(response.body);
+        String errorMessage = 'An error occurred. Please try again.';
+        if (responseBody.containsKey('error')) {
+          final errorField = responseBody['error'];
+          if (errorField is String) {
+            errorMessage = errorField;
+          } else if (errorField is Map) {
+            errorMessage = errorField['message'] ?? errorField.toString();
+          }
+        } else if (responseBody.containsKey('message')) {
+          errorMessage = responseBody['message'];
+        }
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(errorMessage)),
+      );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Unexpected error. Please try again.")),
+        );
+      }
+
+      return;
+    }
   }
 
-  // check if email exists
-  void handleFindButton() {
-    if (_emailController.text.isNotEmpty && doesExistEmail(_emailController.text)) {
+  Future<void> verifyCode() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final response = await http.post(
+      Uri.parse('$apiUrl/verify-code'),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": _emailController.text,
+        "code": _codeController.text,
+      }),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (response.statusCode == 200) {
       setState(() {
-        _isEmailEntered = true;
+        _isCodeVerified = true;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Code verified. Enter new password.")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Invalid code. Try again.")),
+      );
+    }
+  }
+
+  // Function to change the password
+  Future<void> changePassword() async {
+  String password = _passwordController.text;
+  String confirmPassword = _confirmPasswordController.text;
+
+  if (password != confirmPassword) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Passwords do not match.")),
+    );
+    return;
+  }
+
+  if (!isValidPassword(password)) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Password must be at least 8 characters, "
+          "include 1 uppercase letter, 1 number, and 1 special character.")),
+    );
+    return;
+  }
+
+  setState(() {
+    _isLoading = true;
+  });
+
+  final response = await http.post(
+    Uri.parse('$apiUrl/change-password'),
+    headers: {"Content-Type": "application/json"},
+    body: jsonEncode({
+      "email": _emailController.text,
+      "password": password,
+    }),
+  );
+
+  setState(() {
+    _isLoading = false;
+  });
+
+  if (response.statusCode == 200) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Password reset successful! Return to login.")),
+    );
+    Navigator.pop(context);
+  } else {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error changing password. Try again.")),
+    );
+  }
+}
+
+  void handleFindButton() {
+    if (_emailController.text.isNotEmpty) {
+      setState(() {
         _isEmailValid = true;
       });
-
-      // do the email API
       sendCodeToEmail(_emailController.text);
     } else {
       setState(() {
@@ -58,7 +179,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFFFFFFF),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -89,7 +210,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                 ],
               ),
-            if (_isEmailEntered && _isCodeSent)
+            if (_isEmailEntered && _isCodeSent && !_isCodeVerified)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -102,6 +223,16 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                     ),
                   ),
                   SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: verifyCode,
+                    child: Text("Verify Code"),
+                  ),
+                ],
+              ),
+            if (_isEmailEntered && _isCodeVerified)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Text("Create a new password:"),
                   TextField(
                     controller: _passwordController,
@@ -121,30 +252,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                   ),
                   SizedBox(height: 20),
                   ElevatedButton(
-                    onPressed: () {
-                      // check if password is valid
-                      if (_passwordController.text == _confirmPasswordController.text &&
-                          isValidPassword(_passwordController.text)) {
-                        
-                          // implement the password change API
-
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Password reset successful! Return to login.")),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Passwords do not match or are invalid")),
-                        );
-                      }
-                    },
+                    onPressed: changePassword,
                     child: Text("Reset Password"),
                   ),
                 ],
               ),
-            if (_isEmailEntered && !_isCodeSent)
-              Center(
-                child: CircularProgressIndicator(),
-              ),
+            if (_isLoading) Center(child: CircularProgressIndicator()),
           ],
         ),
       ),

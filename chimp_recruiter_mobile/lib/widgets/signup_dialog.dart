@@ -1,6 +1,8 @@
 import 'package:chimp_recruiter_mobile/screens/student_page.dart';
 import 'package:chimp_recruiter_mobile/screens/recruiter_page.dart';
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class SignupDialog extends StatefulWidget {
   @override
@@ -21,6 +23,8 @@ class _SignupDialogState extends State<SignupDialog> {
   String? _passwordError;
   String? _confirmPasswordError;
 
+  final Uri apiUrl = Uri.parse('http://10.0.2.2:5001/api');
+
   // Checks for valid email format
   bool _isValidEmail(String email) {
     String pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
@@ -34,6 +38,83 @@ class _SignupDialogState extends State<SignupDialog> {
     RegExp regex = RegExp(pattern);
     return regex.hasMatch(password);
   }
+  
+   Future<void> _signup() async {
+    String firstName = _firstNameController.text.trim();
+    String lastName = _lastNameController.text.trim();
+    String email = _emailController.text.trim();
+    String password = _passwordController.text.trim();
+    String confirmPassword = _confirmPasswordController.text.trim();
+
+    setState(() {
+      _firstNameError = firstName.isEmpty ? "Empty Field" : null;
+      _lastNameError = lastName.isEmpty ? "Empty Field" : null;
+      _emailError = !_isValidEmail(email) ? "Invalid Email Address" : null;
+      _passwordError = !_isValidPassword(password) ? "Invalid Password" : null;
+      _confirmPasswordError = (password != confirmPassword) ? "Passwords do not match" : null;
+    });
+
+    if (_firstNameError != null ||
+        _lastNameError != null ||
+        _emailError != null ||
+        _passwordError != null ||
+        _confirmPasswordError != null) {
+      return;
+    }
+
+    Uri endpointUri;
+
+    Map<String, dynamic> requestData = {
+      "FirstName": firstName,
+      "LastName": lastName,
+      "Email": email,
+      "Password": password,
+    };
+    
+    if (_userType == "Recruiter") {
+      endpointUri = Uri.parse('${apiUrl.origin}/api/recruiter/signup');
+      requestData.addAll({
+        "LinkedIn": "N/A",
+        "Company": "N/A",
+        "Events": [],
+      });
+    } else {
+      endpointUri = Uri.parse('${apiUrl.origin}/api/student/signup');
+      requestData.addAll({
+        "School": "N/A",
+        "Grad_Semester": "N/A",
+        "Grad_Year": "N/A",
+        "Bio": "N/A",
+        "Job_Performance": [],
+      });
+    }
+
+    try {
+      final response = await http.post(
+        endpointUri,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(requestData),
+      );
+
+      final responseData = jsonDecode(response.body);
+
+      if (response.statusCode == 201) {
+        print("Signup Successful: $responseData");
+        Navigator.pop(context);
+      } else {
+        print("Signup Failed: ${responseData['error']}");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(responseData['error'] ?? "Signup failed")),
+        );
+      }
+    } catch (error) {
+      print("API Error: $error");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Network error. Please try again.")),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -203,70 +284,7 @@ class _SignupDialogState extends State<SignupDialog> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-
-                        // Check if first name is empty
-                        if (_firstNameController.text.isEmpty) {
-                          setState(() {
-                            _firstNameError = "Empty Field";
-                          });
-                          return;
-                        } else {
-                          setState(() {
-                            _firstNameError = null;
-                          });
-                        }
-
-                        // Check if last name is empty
-                        if (_lastNameController.text.isEmpty) {
-                          setState(() {
-                            _lastNameError = "Empty Field";
-                          });
-                          return;
-                        } else {
-                          setState(() {
-                            _lastNameError = null;
-                          });
-                        }
-
-                        // Validate Email
-                        if (!_isValidEmail(_emailController.text)) {
-                          setState(() {
-                            _emailError = 'Invalid Email Address';
-                          });
-                          return;
-                        } else {
-                          setState(() {
-                            _emailError = null;
-                          });
-                        }
-
-                        // Validate Password
-                        if (!_isValidPassword(_passwordController.text)) {
-                          setState(() {
-                            _passwordError = 'Invalid Password';
-                          });
-                          return;
-                        } else {
-                          setState(() {
-                            _passwordError = null;
-                          });
-                        }
-
-                        // Check confirmation password match
-                        if (_passwordController.text != _confirmPasswordController.text) {
-                          setState(() {
-                            _confirmPasswordError = 'Passwords do not match';
-                          });
-                          return;
-                        }
-                        else {
-                          setState(() {
-                            _confirmPasswordError = null;
-                          });
-                        }
-
-                        // Perform signup API here then open the dialog box for email code
-
+                        _signup();
                       },
                       style: ElevatedButton.styleFrom(
                         minimumSize: Size(100, 50),

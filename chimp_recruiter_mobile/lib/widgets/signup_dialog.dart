@@ -23,6 +23,21 @@ class _SignupDialogState extends State<SignupDialog> {
   String? _passwordError;
   String? _confirmPasswordError;
 
+  final FocusNode _passwordFocusNode = FocusNode();
+  bool _showPasswordRequirements = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _passwordFocusNode.addListener(() {
+      setState(() {
+        _showPasswordRequirements = _passwordFocusNode.hasFocus;
+      });
+    });
+  }
+
+
   final Uri apiUrl = Uri.parse('http://10.0.2.2:5001/api');
 
   // Checks for valid email format
@@ -206,6 +221,7 @@ class _SignupDialogState extends State<SignupDialog> {
               child: TextFormField(
                 controller: _passwordController,
                 obscureText: true,
+                focusNode: _passwordFocusNode,
                 decoration: InputDecoration(
                   labelText: 'Password',
                   border: OutlineInputBorder(
@@ -218,6 +234,26 @@ class _SignupDialogState extends State<SignupDialog> {
               ),
             ),
             SizedBox(height: 10),
+
+
+            if (_showPasswordRequirements) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Text(
+                  'Password must:\n'
+                  '• Be 8 characters long\n'
+                  '• Include an uppercase\n'
+                  '• Include a number\n'
+                  '• Include a special character',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+              SizedBox(height: 10),
+            ],
+
 
             // Confirm Password field
             Padding(

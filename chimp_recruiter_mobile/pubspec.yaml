@@ -97,6 +97,7 @@ flutter:
     - assets/images/online-education.png
     - assets/images/letter.png
     - assets/images/sample_qr.png
+    - assets/images/dogtag.png
 
   fonts:
     - family: IrishGrover

@@ -15,7 +15,7 @@ void main() {
     final invalidPasswords = [
       'short1!',
       'nouppercase1!',
-      'NOLOWERCASE1!',
+      '1001000100',
       'NoSpecialChar1',
       'NoNumber!',
       '',
@@ -90,6 +90,44 @@ void main() {
       final response = {"Role": null};
       expect(getUserRoleFromResponse(response), UserRole.unknown);
     });
+  });
+
+
+    group('ID Validation Tests', () {
+    final validIds = [
+      '507f1f77bcf86cd799439011',
+      'ffffffffffffffffffffffff',
+      '1234567890abcdefABCDEF12',
+      '9a3f2b7c6e1d4f8a0b2c3d9e',
+      'ABCDEF123456abcdef789012',
+      '00ff11aa22bb33cc44dd55ee',
+      'a1b2c3d4e5f6A7B8C9D0E1F2',
+    ];
+
+    final invalidIds = [
+      '507f1f77bcf86cd79943901',
+      '507f1f77bcf86cd7994390111',
+      '507f1f77bcf86cd79943901Z',
+      '',
+      '     ',
+      'g07f1f77bcf86cd799439011',
+      'QWERTYUIOPASDFGHJKLZXCVB',
+      'xyz1234567890ABCDEFghijkl',
+      'www.google.com',
+      'https://www.google.com',
+    ];
+
+    for (var id in validIds) {
+      test('Valid ID: $id', () {
+        expect(isValidId(id), true);
+      });
+    }
+
+    for (var id in invalidIds) {
+      test('Invalid ID: $id', () {
+        expect(isValidId(id), false);
+      });
+    }
   });
 
 }

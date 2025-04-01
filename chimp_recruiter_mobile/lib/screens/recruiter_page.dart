@@ -14,11 +14,45 @@ class RecruiterPage extends StatefulWidget {
 }
 
 class _RecruiterPageState extends State<RecruiterPage> {
+
+    List<dynamic> events = [];
+    bool isLoading = true;
+    bool hasError = false;
+
+    @override
+    void initState() {
+      super.initState();
+      fetchEvents();
+    }
+
+    Future<void> fetchEvents() async {
+    final recruiterId = widget.userData['ID'];
+    final url = Uri.parse('http://10.0.2.2:5001/api/event/list/$recruiterId');
+
+    try {
+      final response = await http.get(url);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        setState(() {
+          events = data['events'];
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to load events');
+      }
+    } catch (e) {
+      print('Error fetching events: $e');
+      setState(() {
+        isLoading = false;
+        hasError = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    final events = widget.userData['Events'] as List<dynamic>;
-
     return Scaffold(
       backgroundColor: Color(0xFFFFFFFF),
       appBar: AppBar(
@@ -64,37 +98,72 @@ class _RecruiterPageState extends State<RecruiterPage> {
           ),
 
           Positioned(
-          left: 0,
-          right: 0,
-          bottom: MediaQuery.of(context).size.height / 2,
-          child: Center(
-            child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Color(0xFFC6E7FF),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: Colors.black,
-                  width: 2,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 4,
-                    offset: Offset(2, 2),
+            left: 0,
+            right: 0,
+            bottom: MediaQuery.of(context).size.height / 2 - 10,
+            child: Center(
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Color(0xFFC6E7FF),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 2,
                   ),
-                ],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(2, 2),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  "Your Events:",
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              
+            ),
+          ),
+
+          Positioned(
+            right: 16,
+            bottom: MediaQuery.of(context).size.height / 2 + 50,
+            child: ElevatedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return QRScannerDialog(
+                      recruiterId: widget.userData['ID'],
+                    );
+                  },
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 126, 195, 245),
+                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 25),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(50),
+                  side: BorderSide(color: Colors.black, width: 2),
+                ),
+                elevation: 4,
               ),
               child: Text(
-                "Your Events:",
+                "Scan",
                 style: TextStyle(
                   fontSize: 20,
+                  color: Colors.black,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
           ),
-        ),
 
           // table/grid for the events
           Positioned(
@@ -102,7 +171,7 @@ class _RecruiterPageState extends State<RecruiterPage> {
             right: 0,
             bottom: 10,
             child: Container(
-              height: MediaQuery.of(context).size.height / 2,
+              height: MediaQuery.of(context).size.height / 2 - 10,
               decoration: BoxDecoration(
                 color: Color(0xFFC6E7FF),
                 borderRadius: BorderRadius.all(Radius.circular(10)),
@@ -127,8 +196,8 @@ class _RecruiterPageState extends State<RecruiterPage> {
                         // currently just holds the string of the objectid
                         final eventId = events[index];
                         return Container(
-                          margin: EdgeInsets.symmetric(vertical: 6),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.black),
@@ -141,25 +210,8 @@ class _RecruiterPageState extends State<RecruiterPage> {
                               Expanded(
                                 child: Text(
                                   eventId,
-                                  style: TextStyle(fontSize: 16),
+                                  style: TextStyle(fontSize: 18),
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                              
-                              ElevatedButton(
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return QRScannerDialog();
-                                    },
-                                  );
-                                  
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Color(0xFFC6E7FF),
-                                ),
-                                child: Text("Scan"),
                               ),
                             ],
                           ),

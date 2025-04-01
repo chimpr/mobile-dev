@@ -56,10 +56,14 @@ class _StudentPageState extends State<StudentPage> {
 
           Container(
             decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/dogtag.png'),
+                fit: BoxFit.cover,
+              ),
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white, const Color.fromARGB(255, 214, 229, 255)], 
+                colors: [Colors.white.withOpacity(0.6), const Color.fromARGB(255, 214, 229, 255).withOpacity(0.6)],
               ),
             ),
           ),
@@ -85,23 +89,24 @@ class _StudentPageState extends State<StudentPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                SizedBox(height: 300),
                 Text(
-                  'Welcome,\n${widget.userData['FirstName']}',
+                  '${widget.userData['FirstName']} ${widget.userData['LastName']}',
                   style: TextStyle(
                     fontFamily: 'PermanentMarker',
                     color: Colors.black,
                     fontSize: 32,
                   ),
                 ),
-                SizedBox(height: 50),
+                SizedBox(height: 25),
 
                 isLoading
                     ? CircularProgressIndicator()
                     : qrImageUrl != null
                         ? Image.network(
                             qrImageUrl!,
-                            width: 300,
-                            height: 300,
+                            width: 280,
+                            height: 280,
                             fit: BoxFit.fill,
                           )
                         : Text("Failed to load QR code"),

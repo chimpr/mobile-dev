@@ -19,3 +19,9 @@ UserRole getUserRoleFromResponse(Map<String, dynamic> responseData) {
   if (role == "Recruiter") return UserRole.recruiter;
   return UserRole.unknown;
 }
+
+// qr code string testing cloned from qr scanner dialog
+bool isValidId(String id) {
+  final regex = RegExp(r'^[a-fA-F0-9]{24}$');
+  return regex.hasMatch(id);
+}

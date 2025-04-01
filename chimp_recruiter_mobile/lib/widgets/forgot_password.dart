@@ -34,28 +34,22 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       _isLoading = true;
     });
 
-    final response = await http.post(
-      Uri.parse('$apiUrl/send-reset-code'),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email}),
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.statusCode == 200) {
-      setState(() {
-        _isCodeSent = true;
-        _isEmailEntered = true;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Verification code sent. Check your email.")),
+    try {
+      final response = await http.post(
+        Uri.parse('$apiUrl/send-reset-code'),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email}),
       );
 
-      return;
-    } else {
-      try {
+      if (response.statusCode == 200) {
+        setState(() {
+          _isCodeSent = true;
+          _isEmailEntered = true;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Verification code sent. Check your email.")),
+        );
+      } else {
         final Map<String, dynamic> responseBody = jsonDecode(response.body);
         String errorMessage = 'An error occurred. Please try again.';
         if (responseBody.containsKey('error')) {
@@ -72,13 +66,15 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(errorMessage)),
       );
-      } catch (e) {
+    }
+    } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Unexpected error. Please try again.")),
         );
-      }
-
-      return;
+    } finally {
+      setState(() {
+        _isLoading = false;
+      }); 
     }
   }
 
@@ -105,7 +101,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         _isCodeVerified = true;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Code verified. Enter new password.")),
+        SnackBar(content: Text("Enter your new password.")),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -153,7 +149,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
 
   if (response.statusCode == 200) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("Password reset successful! Return to login.")),
+      SnackBar(content: Text("Password reset successful.")),
     );
     Navigator.pop(context);
   } else {

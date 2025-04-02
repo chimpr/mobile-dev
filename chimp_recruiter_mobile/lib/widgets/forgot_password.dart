@@ -20,7 +20,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
   bool _isCodeVerified = false;
   bool _isLoading = false;
 
-  final String apiUrl = 'http://10.0.2.2:5001/api';
+  final String apiUrl = 'http://chimprecruiter.online:5001/api';
 
   // Password validation
   bool isValidPassword(String password) {

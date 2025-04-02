@@ -27,7 +27,7 @@ class _QRScannerDialogState extends State<QRScannerDialog> {
       isProcessing = true;
     });
 
-    final url = Uri.parse('http://10.0.2.2:5001/api/student/$studentId');
+    final url = Uri.parse('http://chimprecruiter.online:5001/api/student/$studentId');
 
     try {
       final response = await http.get(url);

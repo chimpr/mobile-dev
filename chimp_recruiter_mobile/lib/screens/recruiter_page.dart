@@ -27,7 +27,7 @@ class _RecruiterPageState extends State<RecruiterPage> {
 
     Future<void> fetchEvents() async {
     final recruiterId = widget.userData['ID'];
-    final url = Uri.parse('http://10.0.2.2:5001/api/event/list/$recruiterId');
+    final url = Uri.parse('http://chimprecruiter.online:5001/api/event/list/$recruiterId');
 
     try {
       final response = await http.get(url);

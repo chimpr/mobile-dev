@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:chimp_recruiter_mobile/screens/student_page.dart';
 import 'package:chimp_recruiter_mobile/screens/recruiter_page.dart';
 import 'package:chimp_recruiter_mobile/widgets/forgot_password.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginDialog extends StatefulWidget {
   @override
@@ -13,6 +14,8 @@ class LoginDialog extends StatefulWidget {
 class _LoginDialogState extends State<LoginDialog> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final storage = FlutterSecureStorage();
+
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -33,7 +36,7 @@ class _LoginDialogState extends State<LoginDialog> {
       return;
     }
 
-    final Uri apiUrl = Uri.parse('http://10.0.2.2:5001/api/login');
+    final Uri apiUrl = Uri.parse('http://chimprecruiter.online:5001/api/login');
 
     try {
       final response = await http.post(

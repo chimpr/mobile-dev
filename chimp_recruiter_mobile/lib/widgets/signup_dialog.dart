@@ -38,7 +38,7 @@ class _SignupDialogState extends State<SignupDialog> {
   }
 
 
-  final Uri apiUrl = Uri.parse('http://10.0.2.2:5001/api');
+  final Uri apiUrl = Uri.parse('http://chimprecruiter.online:5001/api');
 
   // Checks for valid email format
   bool _isValidEmail(String email) {
@@ -91,7 +91,6 @@ class _SignupDialogState extends State<SignupDialog> {
       requestData.addAll({
         "LinkedIn": "N/A",
         "Company": "N/A",
-        "Events": [],
       });
     } else {
       endpointUri = Uri.parse('${apiUrl.origin}/api/student/signup');

@@ -23,7 +23,7 @@ class _StudentPageState extends State<StudentPage> {
   }
 
   Future<void> fetchQrCode() async {
-    final Uri apiUrl = Uri.parse('http://10.0.2.2:5001/api/generate-qr');
+    final Uri apiUrl = Uri.parse('http://chimprecruiter.online:5001/api/generate-qr');
 
     try {
       final response = await http.post(
@@ -35,7 +35,7 @@ class _StudentPageState extends State<StudentPage> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          qrImageUrl = 'http://10.0.2.2:5001${data['qrImage']}';
+          qrImageUrl = 'http://chimprecruiter.online:5001${data['qrImage']}';
           isLoading = false;
         });
       } else {

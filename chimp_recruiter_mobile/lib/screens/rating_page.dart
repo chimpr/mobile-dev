@@ -17,47 +17,122 @@ class _RatingPageState extends State<RatingPage> {
     'Communication': 3,
   };
 
+  bool _isSubmitting = false;
+
+  Future<void> submitScan() async {
+    setState(() {
+      _isSubmitting = true;
+    });
+
+    int totalScore = ratings.values.reduce((a, b) => a + b);
+    final studentId = widget.studentData['Student_ID'];
+    final recruiterId = widget.recruiterId;
+
+    final url = Uri.parse('http://chimprecruiter.online:5001/api/scans');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'Student_ID': studentId,
+          'Recruiter_ID': recruiterId,
+          'Score': totalScore,
+        }),
+      );
+
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Score has been submitted.')),
+        );
+        Navigator.pop(context);
+      } else {
+        print('Failed with status: ${response.statusCode}');
+        print('Response body: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to submit score.')),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred.')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
 
   final studentName = '${widget.studentData['FirstName']} ${widget.studentData['LastName']}';
+  String imagePath = 'assets/images/rating${ratings['Communication']}.png';
 
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leadingWidth: 100,
-        leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Container(
-            alignment: Alignment.center,
-            margin: EdgeInsets.only(left: 10, top: 8, bottom: 8),
-            decoration: BoxDecoration(
-              color: Color.fromARGB(255, 255, 81, 81),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Cancel',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black,
-              ),
+  return Scaffold(
+    appBar: AppBar(
+      backgroundColor: Color(0xFFD4F6FF),
+      elevation: 0,
+      leadingWidth: 100,
+      leading: InkWell(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: Container(
+          alignment: Alignment.center,
+          margin: EdgeInsets.only(left: 10, top: 8, bottom: 8),
+          decoration: BoxDecoration(
+            color: Color.fromARGB(255, 255, 81, 81),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.black,
             ),
           ),
         ),
       ),
-      body: Center(
+    ),
+    body: Container(
+      color: Color(0xFFD4F6FF),
+      child: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: SingleChildScrollView(
             child: Column(
-
               children: [
                 SizedBox(height: 20),
-                Text("How Would You Rate $studentName?"),
+                Text(
+                  style: TextStyle(
+                    fontFamily: 'PermanentMarker',
+                    fontSize: 28,
+                  ),
+                  "How Would You Rate"
+                  ),
+                Text(
+                style: TextStyle(
+                  fontFamily: 'PermanentMarker',
+                  fontSize: 28,
+                ),
+                "$studentName?"
+                ),
+                SizedBox(height: 20),
+      
+                Image.asset(
+                  imagePath,
+                  width: 200,
+                  height: 200,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 20),
+                
                 ...ratings.keys.map((category) {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,7 +150,7 @@ class _RatingPageState extends State<RatingPage> {
                             label: Text(
                               score.toString(),
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 20,
                               ),
                               ),
                             labelPadding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -106,17 +181,16 @@ class _RatingPageState extends State<RatingPage> {
                 SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () {
-                    // do api later
-                    int totalScore = ratings.values.map((value) => (value).toInt()).reduce((a, b) => a + b);
-                    print("Total Score: $totalScore");
+                    submitScan();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFD4F6FF),
+                    backgroundColor: Color.fromARGB(255, 108, 222, 253),
                   ),
                   child: Text('Submit'),
                 ),
                 SizedBox(height: 10),
               ],
+              ),
             ),
           ),
         ),

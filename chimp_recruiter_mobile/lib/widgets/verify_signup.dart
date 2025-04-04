@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:chimp_recruiter_mobile/screens/home_screen.dart';
 
 
 class VerifySignup extends StatefulWidget {
   final String email;
-  VerifySignup({required this.email});
+  final Map<String, dynamic> requestData;
+  final bool isRecruiter;
+
+  VerifySignup({required this.email, required this.requestData, required this.isRecruiter});
 
   @override
   _VerifySignupState createState() => _VerifySignupState();
@@ -35,10 +39,12 @@ class _VerifySignupState extends State<VerifySignup> {
 
     try {
       final response = await http.post(
-        Uri.parse('$apiUrl/send-reset-code'),
+        Uri.parse('$apiUrl/send-new-code'),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({"email": email}),
       );
+
+      print(response.statusCode);
 
       if (response.statusCode == 200) {
         setState(() {
@@ -86,12 +92,35 @@ class _VerifySignupState extends State<VerifySignup> {
           _isCodeVerified = true;
         });
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Email successfully verified!")),
+        final endpoint = widget.isRecruiter
+          ? '$apiUrl/recruiter/signup'
+          : '$apiUrl/student/signup';
+
+        final signupResponse = await http.post(
+          Uri.parse(endpoint),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(widget.requestData),
         );
 
-        await Future.delayed(Duration(seconds: 1));
-        if (mounted) Navigator.pop(context);
+        if (signupResponse.statusCode == 201) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Signup successful.")),
+          );
+
+          await Future.delayed(Duration(seconds: 1));
+          if (!mounted) return;
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+            (route) => false,
+          );
+        } else {
+          final body = jsonDecode(signupResponse.body);
+          final error = body['error'] ?? 'Signup failed.';
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error)),
+          );
+        }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Invalid code. Try again.")),

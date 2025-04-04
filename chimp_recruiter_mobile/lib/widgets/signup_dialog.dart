@@ -3,6 +3,7 @@ import 'package:chimp_recruiter_mobile/screens/recruiter_page.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:chimp_recruiter_mobile/widgets/verify_signup.dart';
 
 class SignupDialog extends StatefulWidget {
   @override
@@ -103,30 +104,16 @@ class _SignupDialogState extends State<SignupDialog> {
       });
     }
 
-    try {
-      final response = await http.post(
-        endpointUri,
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode(requestData),
-      );
-
-      final responseData = jsonDecode(response.body);
-
-      if (response.statusCode == 201) {
-        print("Signup Successful: $responseData");
-        Navigator.pop(context);
-      } else {
-        print("Signup Failed: ${responseData['error']}");
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(responseData['error'] ?? "Signup failed")),
-        );
-      }
-    } catch (error) {
-      print("API Error: $error");
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Network error. Please try again.")),
-      );
-    }
+    final success = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => VerifySignup(
+          email: email,
+          requestData: requestData,
+          isRecruiter: _userType == "Recruiter",
+        ),
+      ),
+    );
   }
 
 

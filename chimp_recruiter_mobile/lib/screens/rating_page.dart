@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:chimp_recruiter_mobile/screens/home_screen.dart';
 
 class RatingPage extends StatefulWidget {
   final String recruiterId;
@@ -29,11 +31,16 @@ class _RatingPageState extends State<RatingPage> {
     final recruiterId = widget.recruiterId;
 
     final url = Uri.parse('http://chimprecruiter.online:5001/api/scans');
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'jwt');
 
     try {
       final response = await http.post(
         url,
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
         body: json.encode({
           'Student_ID': studentId,
           'Recruiter_ID': recruiterId,
@@ -47,6 +54,14 @@ class _RatingPageState extends State<RatingPage> {
           SnackBar(content: Text('Score has been submitted.')),
         );
         Navigator.pop(context);
+      } else if (response.statusCode == 403) {
+        await storage.delete(key: 'jwt');
+        if (!mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false,
+        );
       } else {
         print('Failed with status: ${response.statusCode}');
         print('Response body: ${response.body}');

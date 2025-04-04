@@ -2,8 +2,10 @@ import 'dart:typed_data';
 import 'dart:convert';
 import 'package:chimp_recruiter_mobile/screens/rating_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:http/http.dart' as http;
+import 'package:chimp_recruiter_mobile/screens/home_screen.dart';
 
 class QRScannerDialog extends StatefulWidget {
   final String recruiterId;
@@ -28,15 +30,23 @@ class _QRScannerDialogState extends State<QRScannerDialog> {
     });
 
     final url = Uri.parse('http://chimprecruiter.online:5001/api/student/$studentId');
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'jwt');
 
     try {
-      final response = await http.get(url);
+      final response = await http.get(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
 
       if (response.statusCode == 200) {
         final studentData = json.decode(response.body);
         if (!mounted) return;
 
-        Navigator.of(context).pop(); // close dialog
+        Navigator.of(context).pop();
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => RatingPage(
@@ -44,6 +54,15 @@ class _QRScannerDialogState extends State<QRScannerDialog> {
               studentData: studentData,
             ),
           ),
+        );
+      } else if (response.statusCode == 403) {
+        await storage.delete(key: 'jwt');
+        if (!mounted) return;
+
+        Navigator.of(context).pop();
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false,
         );
       } else if (response.statusCode == 404) {
         if (mounted) {

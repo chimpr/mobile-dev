@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:chimp_recruiter_mobile/screens/home_screen.dart';
 
 class StudentPage extends StatefulWidget {
 
@@ -24,11 +26,16 @@ class _StudentPageState extends State<StudentPage> {
 
   Future<void> fetchQrCode() async {
     final Uri apiUrl = Uri.parse('http://chimprecruiter.online:5001/api/generate-qr');
+    final storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'jwt');
 
     try {
       final response = await http.post(
         apiUrl,
-        headers: {"Content-Type": "application/json"},
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer $token",
+        },
         body: jsonEncode({"userId": widget.userData['ID']}),
       );
 
@@ -38,6 +45,14 @@ class _StudentPageState extends State<StudentPage> {
           qrImageUrl = 'http://chimprecruiter.online:5001${data['qrImage']}';
           isLoading = false;
         });
+      }  else if (response.statusCode == 403) {
+        await storage.delete(key: 'jwt');
+        if (!mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+          (route) => false,
+        );
       } else {
         print('Error: ${response.body}');
         setState(() => isLoading = false);
@@ -72,8 +87,16 @@ class _StudentPageState extends State<StudentPage> {
             top: 20,
             right: 20,
             child: ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
+              onPressed: () async {
+                final storage = FlutterSecureStorage();
+                await storage.delete(key: 'jwt');
+
+                if (!mounted) return;
+
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                  (route) => false,
+                );
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,

@@ -49,6 +49,9 @@ class _LoginDialogState extends State<LoginDialog> {
 
       if (response.statusCode == 200) {
         String role = responseData["Role"] ?? "";
+        String token = responseData["token"] ?? "";
+
+        await storage.write(key: 'jwt', value: token);
 
       if (role == "Student") {
         Navigator.pushReplacement(

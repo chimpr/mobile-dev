@@ -116,7 +116,6 @@ class _SignupDialogState extends State<SignupDialog> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
 

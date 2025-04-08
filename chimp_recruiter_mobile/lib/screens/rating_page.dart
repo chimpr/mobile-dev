@@ -6,9 +6,10 @@ import 'package:chimp_recruiter_mobile/screens/home_screen.dart';
 
 class RatingPage extends StatefulWidget {
   final String recruiterId;
+  final String eventId;
   final Map<String, dynamic> studentData;
 
-  RatingPage({required this.recruiterId, required this.studentData});
+  RatingPage({required this.recruiterId, required this.eventId, required this.studentData});
 
   @override
   _RatingPageState createState() => _RatingPageState();
@@ -27,8 +28,9 @@ class _RatingPageState extends State<RatingPage> {
     });
 
     int totalScore = ratings.values.reduce((a, b) => a + b);
-    final studentId = widget.studentData['Student_ID'];
+    final studentId = widget.studentData['_id'];
     final recruiterId = widget.recruiterId;
+    final eventId = widget.eventId;
 
     final url = Uri.parse('http://chimprecruiter.online:5001/api/scans');
     final storage = FlutterSecureStorage();
@@ -44,15 +46,18 @@ class _RatingPageState extends State<RatingPage> {
         body: json.encode({
           'Student_ID': studentId,
           'Recruiter_ID': recruiterId,
+          'Event_ID' : eventId,
           'Score': totalScore,
         }),
       );
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Score has been submitted.')),
         );
+
         Navigator.pop(context);
       } else if (response.statusCode == 403) {
         await storage.delete(key: 'jwt');

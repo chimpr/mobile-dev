@@ -9,8 +9,9 @@ import 'package:chimp_recruiter_mobile/screens/home_screen.dart';
 
 class QRScannerDialog extends StatefulWidget {
   final String recruiterId;
+  final String eventId;
 
-  QRScannerDialog({required this.recruiterId});
+  QRScannerDialog({required this.recruiterId, required this.eventId});
 
   @override
   _QRScannerDialogState createState() => _QRScannerDialogState();
@@ -51,6 +52,7 @@ class _QRScannerDialogState extends State<QRScannerDialog> {
           MaterialPageRoute(
             builder: (context) => RatingPage(
               recruiterId: widget.recruiterId,
+              eventId: widget.eventId,
               studentData: studentData,
             ),
           ),

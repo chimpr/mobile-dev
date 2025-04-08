@@ -49,7 +49,7 @@ class _LoginDialogState extends State<LoginDialog> {
 
       if (response.statusCode == 200) {
         String role = responseData["Role"] ?? "";
-        String token = responseData["token"] ?? "";
+        String token = responseData["Token"] ?? "";
 
         await storage.write(key: 'jwt', value: token);
 

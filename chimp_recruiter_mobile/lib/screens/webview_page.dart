@@ -11,8 +11,8 @@ class WebViewContainer extends StatefulWidget {
 class _WebViewContainerState extends State<WebViewContainer> {
 
   final controller = WebViewController()
-  ..setJavaScriptMode(JavaScriptMode.disabled)
-  ..loadRequest(Uri.parse('https://flutter.dev')); // Change this link later to our signup page
+  ..setJavaScriptMode(JavaScriptMode.unrestricted)
+  ..loadRequest(Uri.parse('http://chimprecruiter.online'));
 
   @override
   Widget build(BuildContext context) {

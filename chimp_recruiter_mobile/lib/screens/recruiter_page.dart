@@ -152,40 +152,6 @@ class _RecruiterPageState extends State<RecruiterPage> {
             ),
           ),
 
-          Positioned(
-            right: 16,
-            bottom: MediaQuery.of(context).size.height / 2 + 50,
-            child: ElevatedButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return QRScannerDialog(
-                      recruiterId: widget.userData['ID'],
-                    );
-                  },
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 126, 195, 245),
-                padding: EdgeInsets.symmetric(horizontal: 25, vertical: 25),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50),
-                  side: BorderSide(color: Colors.black, width: 2),
-                ),
-                elevation: 4,
-              ),
-              child: Text(
-                "Scan",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-
           // table/grid for the events
           Positioned(
             left: 0,
@@ -215,7 +181,9 @@ class _RecruiterPageState extends State<RecruiterPage> {
                       itemCount: events.length,
                       itemBuilder: (context, index) {
                         // currently just holds the string of the objectid
-                        final eventId = events[index];
+                        final event = events[index];
+                        final eventName = event['Name'] ?? 'Unnamed Event';
+                        final eventId = event['_id'];
                         return Container(
                           margin: EdgeInsets.symmetric(vertical: 8),
                           padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -230,8 +198,37 @@ class _RecruiterPageState extends State<RecruiterPage> {
                               
                               Expanded(
                                 child: Text(
-                                  eventId,
+                                  eventName,
                                   style: TextStyle(fontSize: 18),
+                                ),
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return QRScannerDialog(
+                                        recruiterId: widget.userData['ID'],
+                                        eventId: eventId,
+                                      );
+                                    },
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Color.fromARGB(255, 126, 195, 245),
+                                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    side: BorderSide(color: Colors.black, width: 2),
+                                  ),
+                                ),
+                                child: Text(
+                                  "Scan",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],

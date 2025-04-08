@@ -78,11 +78,11 @@ class HomeScreen extends StatelessWidget {
                   SizedBox(width: 50),
                   ElevatedButton(
                     onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (context) {
-                          return SignupDialog();
-                        },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const WebViewContainer(),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(
